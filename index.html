@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>French DELF A2 Study Agent</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, sans-serif; background: #f9f9f7; color: #1a1a18; min-height: 100vh; padding: 1.5rem 1rem; }
+    .container { max-width: 680px; margin: 0 auto; }
+    :root {
+      --bg-primary: #ffffff;
+      --bg-secondary: #f1efe8;
+      --bg-info: #e6f1fb;
+      --bg-success: #eaf3de;
+      --bg-danger: #fcebeb;
+      --bg-warning: #faeeda;
+      --text-primary: #1a1a18;
+      --text-secondary: #5f5e5a;
+      --text-tertiary: #888780;
+      --text-info: #185fa5;
+      --text-success: #3b6d11;
+      --text-danger: #a32d2d;
+      --text-warning: #854f0b;
+      --border-light: rgba(0,0,0,0.12);
+      --border-mid: rgba(0,0,0,0.22);
+      --radius-md: 8px;
+      --radius-lg: 12px;
+    }
+    @media (prefers-color-scheme: dark) {
+      body { background: #1a1a18; color: #f1efe8; }
+      :root {
+        --bg-primary: #2c2c2a;
+        --bg-secondary: #222220;
+        --bg-info: #042c53;
+        --bg-success: #173404;
+        --bg-danger: #501313;
+        --bg-warning: #412402;
+        --text-primary: #f1efe8;
+        --text-secondary: #b4b2a9;
+        --text-tertiary: #888780;
+        --text-info: #85b7eb;
+        --text-success: #97c459;
+        --text-danger: #f09595;
+        --text-warning: #ef9f27;
+        --border-light: rgba(255,255,255,0.12);
+        --border-mid: rgba(255,255,255,0.22);
+      }
+    }
+    .nav { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+    .nav button { font-size: 13px; padding: 6px 14px; border-radius: 20px; border: 0.5px solid var(--border-mid); background: transparent; color: var(--text-secondary); cursor: pointer; transition: all 0.15s; }
+    .nav button.active { background: var(--bg-secondary); color: var(--text-primary); font-weight: 500; }
+    .nav button:hover:not(.active) { background: var(--bg-secondary); }
+    .section { display: none; }
+    .section.active { display: block; }
+    .card { background: var(--bg-primary); border: 0.5px solid var(--border-light); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 1rem; }
+    .label { font-size: 12px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
+    .muted { font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
+    .badge { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 10px; margin-left: 6px; background: var(--bg-warning); color: var(--text-warning); }
+    .btn { padding: 8px 16px; border-radius: var(--radius-md); border: 0.5px solid var(--border-mid); background: transparent; color: var(--text-primary); cursor: pointer; font-size: 14px; transition: all 0.15s; }
+    .btn:hover { background: var(--bg-secondary); }
+    .btn-primary { background: var(--text-primary); color: var(--bg-primary); border-color: var(--text-primary); }
+    .btn-primary:hover { opacity: 0.85; }
+    input[type=text], textarea, select { width: 100%; padding: 10px 12px; border: 0.5px solid var(--border-mid); border-radius: var(--radius-md); font-size: 14px; background: var(--bg-primary); color: var(--text-primary); font-family: inherit; }
+    textarea { resize: vertical; min-height: 80px; }
+    .flashcard { min-height: 160px; display: flex; align-items: center; justify-content: center; text-align: center; cursor: pointer; user-select: none; border: 0.5px solid var(--border-mid); border-radius: var(--radius-lg); padding: 2rem; background: var(--bg-secondary); }
+    .fc-front { font-size: 26px; font-weight: 500; color: var(--text-primary); }
+    .fc-back { font-size: 18px; color: var(--text-secondary); }
+    .hint { font-size: 12px; color: var(--text-tertiary); margin-top: 8px; text-align: center; }
+    .progress-bar { height: 6px; border-radius: 3px; background: var(--bg-secondary); overflow: hidden; margin-top: 8px; }
+    .progress-fill { height: 100%; border-radius: 3px; background: var(--text-success); transition: width 0.4s; }
+    .option-btn { width: 100%; text-align: left; padding: 10px 14px; margin-bottom: 6px; border-radius: var(--radius-md); border: 0.5px solid var(--border-light); background: var(--bg-primary); cursor: pointer; font-size: 14px; color: var(--text-primary); transition: all 0.15s; }
+    .option-btn:hover { background: var(--bg-secondary); }
+    .option-btn.correct { border-color: var(--text-success); background: var(--bg-success); color: var(--text-success); }
+    .option-btn.wrong { border-color: var(--text-danger); background: var(--bg-danger); color: var(--text-danger); }
+    .score-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1rem; }
+    .score-card { background: var(--bg-secondary); border-radius: var(--radius-md); padding: 12px; text-align: center; }
+    .score-num { font-size: 22px; font-weight: 500; }
+    .chat-bubble { margin-bottom: 10px; }
+    .chat-bubble .from { font-size: 11px; color: var(--text-tertiary); margin-bottom: 3px; }
+    .bubble-text { display: inline-block; padding: 8px 12px; border-radius: 12px; font-size: 14px; line-height: 1.5; max-width: 90%; white-space: pre-wrap; }
+    .bubble-ai { background: var(--bg-secondary); color: var(--text-primary); border-radius: 4px 12px 12px 12px; }
+    .bubble-user { background: var(--bg-warning); color: var(--text-warning); border-radius: 12px 4px 12px 12px; float: right; }
+    .clearfix::after { content: ''; display: table; clear: both; }
+    .ai-loading { color: var(--text-tertiary); font-size: 13px; font-style: italic; }
+    #chat-history { max-height: 300px; overflow-y: auto; margin-bottom: 12px; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div style="padding: 1rem 0;">
+    <div style="margin-bottom: 1.5rem;">
+      <div style="font-size: 20px; font-weight: 500; color: var(--text-primary);">French study agent <span class="badge">DELF A2</span></div>
+      <div class="muted" style="margin-top: 4px;">Vocabulary · Grammar · Writing · Quiz · AI tutor</div>
+    </div>
+
+    <div class="nav">
+      <button class="active" onclick="switchTab('vocab', this)">Flashcards</button>
+      <button onclick="switchTab('grammar', this)">Grammar</button>
+      <button onclick="switchTab('writing', this)">Writing</button>
+      <button onclick="switchTab('quiz', this)">Quiz</button>
+      <button onclick="switchTab('tutor', this)">AI tutor</button>
+    </div>
+
+    <!-- FLASHCARDS -->
+    <div class="section active" id="tab-vocab">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <div class="label">Vocabulary — tap to reveal</div>
+        <select id="vocab-topic" onchange="loadTopic()" style="width:auto; font-size:13px; padding:5px 10px;">
+          <option value="daily">Daily life</option>
+          <option value="family">Family & people</option>
+          <option value="food">Food & drink</option>
+          <option value="time">Time & dates</option>
+          <option value="places">Places & directions</option>
+        </select>
+      </div>
+      <div class="flashcard" onclick="flipCard()"><div id="fc-content" class="fc-front"></div></div>
+      <div class="hint" id="fc-hint">Tap to reveal</div>
+      <div style="display:flex; gap:10px; margin-top:14px; justify-content:center;">
+        <button class="btn" onclick="markCard(false)">Again</button>
+        <button class="btn" onclick="nextCard()">Skip</button>
+        <button class="btn btn-primary" onclick="markCard(true)">Got it</button>
+      </div>
+      <div style="margin-top:12px;">
+        <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-secondary);">
+          <span id="fc-progress-text">0 / 0</span>
+          <span id="fc-score-text">Score: 0%</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="fc-bar" style="width:0%"></div></div>
+      </div>
+    </div>
+
+    <!-- GRAMMAR -->
+    <div class="section" id="tab-grammar">
+      <div class="label" style="margin-bottom:12px;">Key grammar for DELF A2</div>
+      <div id="grammar-list"></div>
+      <button class="btn" style="margin-top:8px;" onclick="askTutorDirectly('Explain this French A2 grammar point with simple examples and a short exercise: ' + currentGrammar)">Ask AI to explain</button>
+    </div>
+
+    <!-- WRITING -->
+    <div class="section" id="tab-writing">
+      <div class="label" style="margin-bottom:12px;">Writing practice — DELF A2 style</div>
+      <div class="card">
+        <div class="muted" id="writing-prompt-text" style="margin-bottom:10px; line-height:1.6;"></div>
+        <div style="font-size:12px; color:var(--text-tertiary);">Target: 60–80 words · Simple, clear sentences</div>
+      </div>
+      <textarea id="writing-input" placeholder="Écrivez votre réponse ici..."></textarea>
+      <div style="display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="submitWriting()">Get AI feedback</button>
+        <button class="btn" onclick="loadWritingPrompt()">New prompt</button>
+        <span style="font-size:13px; color:var(--text-tertiary); align-self:center;" id="word-count">0 words</span>
+      </div>
+      <div id="writing-feedback" style="margin-top:1rem;"></div>
+    </div>
+
+    <!-- QUIZ -->
+    <div class="section" id="tab-quiz">
+      <div class="score-grid">
+        <div class="score-card"><div class="label">Correct</div><div class="score-num" id="q-correct" style="color:var(--text-success);">0</div></div>
+        <div class="score-card"><div class="label">Attempted</div><div class="score-num" id="q-total">0</div></div>
+      </div>
+      <div class="card">
+        <div style="font-size:12px; color:var(--text-tertiary); margin-bottom:8px;" id="quiz-category"></div>
+        <div style="font-size:16px; font-weight:500; color:var(--text-primary); margin-bottom:16px;" id="quiz-question"></div>
+        <div id="quiz-options"></div>
+      </div>
+      <button class="btn" style="margin-top:4px;" onclick="loadQuiz()">New question</button>
+    </div>
+
+    <!-- AI TUTOR -->
+    <div class="section" id="tab-tutor">
+      <div class="label" style="margin-bottom:10px;">Ask your AI tutor anything</div>
+      <div id="chat-history"></div>
+      <div style="display:flex; gap:8px;">
+        <input type="text" id="tutor-input" placeholder="e.g. How do I use avoir vs être?" onkeydown="if(event.key==='Enter') askTutor()" />
+        <button class="btn btn-primary" onclick="askTutor()">Send</button>
+      </div>
+      <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:10px;">
+        <button class="btn" style="font-size:12px; padding:5px 10px;" onclick="quickAsk('Explain avoir vs être in passé composé with examples')">Avoir vs être</button>
+        <button class="btn" style="font-size:12px; padding:5px 10px;" onclick="quickAsk('What are common DELF A2 writing mistakes to avoid?')">Writing tips</button>
+        <button class="btn" style="font-size:12px; padding:5px 10px;" onclick="quickAsk('Explain how to use articles in French: le, la, les, un, une, des')">Articles</button>
+        <button class="btn" style="font-size:12px; padding:5px 10px;" onclick="quickAsk('Give me 10 common A2 French phrases for everyday conversation')">Useful phrases</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const VOCAB = {
+  daily: [
+    {fr:"se lever", en:"to get up", ex:"Je me lève à sept heures."},
+    {fr:"se coucher", en:"to go to bed", ex:"Elle se couche à dix heures du soir."},
+    {fr:"faire les courses", en:"to go shopping / do the grocery shopping", ex:"Je fais les courses le samedi matin."},
+    {fr:"le ménage", en:"housework / cleaning", ex:"Il fait le ménage le dimanche."},
+    {fr:"se dépêcher", en:"to hurry", ex:"Dépêche-toi, on est en retard !"},
+    {fr:"avoir besoin de", en:"to need", ex:"J'ai besoin d'un stylo, s'il vous plaît."},
+    {fr:"la routine", en:"routine", ex:"Ma routine du matin est simple."},
+    {fr:"le rendez-vous", en:"appointment / meeting", ex:"J'ai un rendez-vous chez le médecin."},
+  ],
+  family: [
+    {fr:"les parents", en:"parents", ex:"Mes parents habitent à Lyon."},
+    {fr:"le frère / la sœur", en:"brother / sister", ex:"J'ai un frère et deux sœurs."},
+    {fr:"les grands-parents", en:"grandparents", ex:"Je visite mes grands-parents le week-end."},
+    {fr:"le mari / la femme", en:"husband / wife", ex:"Son mari s'appelle Thomas."},
+    {fr:"célibataire", en:"single", ex:"Je suis célibataire."},
+    {fr:"avoir … ans", en:"to be … years old", ex:"Ma sœur a vingt ans."},
+    {fr:"ressembler à", en:"to look like", ex:"Tu ressembles beaucoup à ta mère."},
+    {fr:"s'entendre bien avec", en:"to get along well with", ex:"Je m'entends bien avec mes collègues."},
+  ],
+  food: [
+    {fr:"le petit-déjeuner", en:"breakfast", ex:"Je prends mon petit-déjeuner à huit heures."},
+    {fr:"le déjeuner", en:"lunch", ex:"On mange le déjeuner à midi."},
+    {fr:"le dîner", en:"dinner", ex:"Le dîner est à sept heures."},
+    {fr:"avoir faim / soif", en:"to be hungry / thirsty", ex:"J'ai très faim ce soir."},
+    {fr:"commander", en:"to order", ex:"Je voudrais commander une salade, s'il vous plaît."},
+    {fr:"l'addition (f)", en:"the bill", ex:"L'addition, s'il vous plaît !"},
+    {fr:"goûter", en:"to taste", ex:"Tu veux goûter ma tarte ?"},
+    {fr:"végétarien(ne)", en:"vegetarian", ex:"Elle est végétarienne."},
+  ],
+  time: [
+    {fr:"maintenant", en:"now", ex:"Je suis occupé maintenant."},
+    {fr:"tout à l'heure", en:"in a little while / just now", ex:"Je te rappelle tout à l'heure."},
+    {fr:"hier / aujourd'hui / demain", en:"yesterday / today / tomorrow", ex:"Hier j'étais fatigué."},
+    {fr:"la semaine dernière", en:"last week", ex:"La semaine dernière, j'ai visité Paris."},
+    {fr:"le week-end prochain", en:"next weekend", ex:"Le week-end prochain, on part en vacances."},
+    {fr:"il y a + durée", en:"ago", ex:"Il y a deux ans, j'ai appris le français."},
+    {fr:"depuis", en:"since / for", ex:"J'habite ici depuis trois ans."},
+    {fr:"bientôt", en:"soon", ex:"On se voit bientôt !"},
+  ],
+  places: [
+    {fr:"tout droit", en:"straight ahead", ex:"Allez tout droit jusqu'au feu."},
+    {fr:"tourner à gauche / à droite", en:"turn left / right", ex:"Tournez à gauche après la pharmacie."},
+    {fr:"en face de", en:"opposite / across from", ex:"La boulangerie est en face de la poste."},
+    {fr:"à côté de", en:"next to", ex:"L'hôtel est à côté de la gare."},
+    {fr:"près de / loin de", en:"near / far from", ex:"C'est près d'ici ?"},
+    {fr:"le quartier", en:"neighbourhood", ex:"J'habite dans un quartier calme."},
+    {fr:"prendre le métro / le bus", en:"to take the metro / bus", ex:"Je prends le métro pour aller au travail."},
+    {fr:"se trouver", en:"to be located", ex:"Où se trouve la mairie ?"},
+  ]
+};
+
+const GRAMMAR = [
+  {title:"Le passé composé", desc:"Used for completed past actions. Formed with avoir or être + past participle.", example:"J'ai mangé une pomme. Elle est allée au cinéma.", trigger:"Key verbs with être: aller, venir, partir, arriver, naître, mourir + reflexives"},
+  {title:"L'imparfait (introduction)", desc:"Used for descriptions and ongoing past states. Stem = nous form minus -ons.", example:"Quand j'étais petit, j'habitais à Paris. Il faisait beau.", trigger:"Key signal words: quand, tous les jours, souvent, avant"},
+  {title:"Les articles définis & indéfinis", desc:"Définis (le/la/les) = specific things. Indéfinis (un/une/des) = non-specific.", example:"J'aime le chocolat. Je mange une pomme. Il y a des enfants.", trigger:"After negation: pas de/d' (not des/un/une)"},
+  {title:"Les pronoms toniques", desc:"Used after prepositions and for emphasis: moi, toi, lui, elle, nous, vous, eux, elles.", example:"C'est pour moi. Tu viens avec nous ? Lui, il est médecin.", trigger:"After: avec, pour, chez, sans, après, devant"},
+  {title:"Le futur proche", desc:"Express near future plans using aller + infinitive.", example:"Je vais partir demain. Nous allons manger au restaurant.", trigger:"Signal words: ce soir, demain, bientôt, la semaine prochaine"},
+  {title:"Les adjectifs possessifs", desc:"Must agree with the noun they describe, not the owner.", example:"Mon frère, ma sœur, mes parents. Son livre, sa maison.", trigger:"Mon/ma/mes · ton/ta/tes · son/sa/ses · notre/nos · votre/vos · leur/leurs"},
+];
+
+const WRITING_PROMPTS = [
+  "Votre ami(e) vous invite à sa fête d'anniversaire samedi prochain. Écrivez un message pour accepter l'invitation et demandez où et à quelle heure.",
+  "Vous cherchez un appartement. Écrivez un message à un(e) propriétaire pour demander des informations sur l'appartement (taille, prix, transports).",
+  "Décrivez votre routine du matin. Que faites-vous entre le réveil et votre départ pour l'école ou le travail ?",
+  "Vous avez visité un restaurant hier soir. Écrivez un court message à un(e) ami(e) pour décrire votre expérience.",
+  "Vous voulez rejoindre un club de sport dans votre ville. Écrivez un courriel pour demander les horaires, le prix et les activités proposées.",
+];
+
+const QUIZ_DATA = [
+  {cat:"Grammar", q:"Choose the correct form: 'Elle ___ (aller) au marché hier.'", opts:["a allé","est allée","allait","va"], ans:1, exp:"Aller uses être in passé composé. With être, the participle agrees with the subject: elle est allée."},
+  {cat:"Vocabulary", q:"What does 'avoir besoin de' mean?", opts:["to want","to have enough","to need","to be able to"], ans:2, exp:"Avoir besoin de = to need. E.g. J'ai besoin d'aide."},
+  {cat:"Grammar", q:"'Je ___ (manger) une pizza ce soir.' Which futur proche form is correct?", opts:["mangerai","vais manger","mange","ai mangé"], ans:1, exp:"Futur proche = aller + infinitive. Je vais manger."},
+  {cat:"Vocabulary", q:"'Tout droit' means:", opts:["turn right","straight ahead","on the left","nearby"], ans:1, exp:"Tout droit = straight ahead. Used for giving directions."},
+  {cat:"Grammar", q:"'J'aime ___ chocolat.' Which article is correct?", opts:["un","de","le","des"], ans:2, exp:"Use le/la/les with verbs of preference (aimer, adorer, préférer) for general likes."},
+  {cat:"Vocabulary", q:"'Il y a deux ans' means:", opts:["in two years","two years ago","for two years","since two years"], ans:1, exp:"Il y a + duration = ago. E.g. Il y a deux ans = two years ago."},
+  {cat:"Grammar", q:"Which sentence is correct?", opts:["Je n'ai pas un voiture","Je n'ai pas de voiture","Je n'ai pas la voiture","Je n'ai pas voiture"], ans:1, exp:"After negation (pas), un/une/des become de/d'. Je n'ai pas de voiture."},
+  {cat:"Vocabulary", q:"'Se trouver' means:", opts:["to find yourself","to be located","to meet","to look for"], ans:1, exp:"Se trouver = to be located. Où se trouve la gare ? = Where is the station?"},
+  {cat:"Grammar", q:"'C'est pour ___.' Which pronoun completes this?", opts:["je","il","moi","tu"], ans:2, exp:"After prepositions (pour, avec, chez...) use tonic pronouns: moi, toi, lui, elle..."},
+  {cat:"Vocabulary", q:"'Faire les courses' means:", opts:["to run a race","to do the cooking","to go shopping","to clean the house"], ans:2, exp:"Faire les courses = to go grocery shopping or do errands."},
+];
+
+let currentCards=[], cardIndex=0, cardFlipped=false, correct=0;
+let qCorrect=0, qTotal=0, quizAnswered=false, currentQuiz=null;
+let currentGrammar='', chatHistory=[];
+
+// NOTE: Replace this with your own Anthropic API key to enable the AI tutor.
+// Get one at https://console.anthropic.com
+const API_KEY = 'YOUR_ANTHROPIC_API_KEY';
+
+function switchTab(name, btn) {
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+}
+
+function loadTopic() {
+  const topic=document.getElementById('vocab-topic').value;
+  currentCards=[...VOCAB[topic]].sort(()=>Math.random()-0.5);
+  cardIndex=0; correct=0; cardFlipped=false;
+  showCard(); updateProgress();
+}
+
+function showCard() {
+  if(cardIndex>=currentCards.length){
+    document.getElementById('fc-content').className='fc-front';
+    document.getElementById('fc-content').textContent='Set complete!';
+    document.getElementById('fc-hint').textContent='Change topic or reload';
+    return;
+  }
+  cardFlipped=false;
+  document.getElementById('fc-content').className='fc-front';
+  document.getElementById('fc-content').textContent=currentCards[cardIndex].fr;
+  document.getElementById('fc-hint').textContent='Tap to reveal English';
+}
+
+function flipCard() {
+  if(cardIndex>=currentCards.length||cardFlipped) return;
+  cardFlipped=true;
+  const c=currentCards[cardIndex];
+  document.getElementById('fc-content').className='fc-back';
+  document.getElementById('fc-content').innerHTML=c.en+'<div style="font-size:13px;color:var(--text-tertiary);margin-top:10px;font-style:italic;">'+c.ex+'</div>';
+  document.getElementById('fc-hint').textContent='Got it? Mark below.';
+}
+
+function markCard(knew){if(knew)correct++;nextCard();}
+function nextCard(){cardIndex++;showCard();updateProgress();}
+
+function updateProgress(){
+  const total=currentCards.length,done=Math.min(cardIndex,total);
+  const pct=total?Math.round(correct/total*100):0;
+  document.getElementById('fc-progress-text').textContent=done+' / '+total;
+  document.getElementById('fc-score-text').textContent='Score: '+pct+'%';
+  document.getElementById('fc-bar').style.width=(total?(done/total*100):0)+'%';
+}
+
+function loadGrammar(){
+  document.getElementById('grammar-list').innerHTML=GRAMMAR.map((g,i)=>`
+    <div class="card" style="cursor:pointer;" onclick="currentGrammar='${g.title}'">
+      <div style="font-weight:500;font-size:15px;color:var(--text-primary);margin-bottom:4px;">${g.title}</div>
+      <div class="muted" style="margin-bottom:6px;">${g.desc}</div>
+      <div style="font-size:13px;color:var(--text-secondary);font-style:italic;margin-bottom:4px;">${g.example}</div>
+      <div style="font-size:11px;color:var(--text-tertiary);">Key: ${g.trigger}</div>
+    </div>`).join('');
+}
+
+function loadWritingPrompt(){
+  document.getElementById('writing-prompt-text').textContent=WRITING_PROMPTS[Math.floor(Math.random()*WRITING_PROMPTS.length)];
+  document.getElementById('writing-input').value='';
+  document.getElementById('word-count').textContent='0 words';
+  document.getElementById('writing-feedback').innerHTML='';
+}
+
+document.addEventListener('input',function(e){
+  if(e.target.id==='writing-input'){
+    const w=e.target.value.trim().split(/\s+/).filter(x=>x).length;
+    document.getElementById('word-count').textContent=w+' words';
+  }
+});
+
+async function submitWriting(){
+  const prompt=document.getElementById('writing-prompt-text').textContent;
+  const text=document.getElementById('writing-input').value.trim();
+  if(!text) return;
+  const fb=document.getElementById('writing-feedback');
+  fb.innerHTML='<div class="ai-loading">Getting feedback...</div>';
+  const reply=await callClaude('You are a DELF A2 examiner. Give simple, encouraging feedback on this French writing. Check grammar, vocabulary, and structure. Score out of 25 (DELF style). Keep feedback easy to understand. Prompt: "'+prompt+'" Response: "'+text+'"',[]);
+  fb.innerHTML='<div class="card"><div class="label">AI feedback</div><div class="muted" style="margin-top:6px;white-space:pre-wrap;">'+reply+'</div></div>';
+}
+
+function loadQuiz(){
+  quizAnswered=false;
+  currentQuiz=QUIZ_DATA[Math.floor(Math.random()*QUIZ_DATA.length)];
+  document.getElementById('quiz-category').textContent=currentQuiz.cat;
+  document.getElementById('quiz-question').textContent=currentQuiz.q;
+  document.getElementById('quiz-options').innerHTML=currentQuiz.opts.map((o,i)=>
+    `<button class="option-btn" onclick="answerQuiz(${i},this)">${o}</button>`).join('');
+}
+
+function answerQuiz(i,el){
+  if(quizAnswered) return;
+  quizAnswered=true; qTotal++;
+  document.getElementById('q-total').textContent=qTotal;
+  const all=document.querySelectorAll('.option-btn');
+  if(i===currentQuiz.ans){el.classList.add('correct');qCorrect++;}
+  else{el.classList.add('wrong');all[currentQuiz.ans].classList.add('correct');}
+  document.getElementById('q-correct').textContent=qCorrect;
+  const exp=document.createElement('div');
+  exp.style.cssText='margin-top:10px;font-size:13px;color:var(--text-secondary);font-style:italic;';
+  exp.textContent=currentQuiz.exp;
+  document.getElementById('quiz-options').appendChild(exp);
+}
+
+function addBubble(text,isUser){
+  const div=document.createElement('div');
+  div.className='chat-bubble clearfix';
+  div.innerHTML=`<div class="from">${isUser?'You':'Tutor'}</div><div class="bubble-text ${isUser?'bubble-user':'bubble-ai'}">${text}</div>`;
+  document.getElementById('chat-history').appendChild(div);
+  document.getElementById('chat-history').scrollTop=9999;
+}
+
+async function callClaude(userMsg, history){
+  const messages=[...history,{role:'user',content:userMsg}];
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':API_KEY,'anthropic-version':'2023-06-01'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        system:'You are a friendly, patient French tutor helping a beginner prepare for the DELF A2 exam. Use simple language and lots of encouragement. Give short, clear explanations with easy examples. Always provide French examples with English translations.',
+        messages
+      })
+    });
+    const data=await res.json();
+    return data.content.map(c=>c.text||'').join('');
+  } catch(e){ return 'Sorry, something went wrong. Please check your API key.'; }
+}
+
+async function askTutor(){
+  const input=document.getElementById('tutor-input');
+  const msg=input.value.trim();
+  if(!msg) return;
+  input.value='';
+  addBubble(msg,true);
+  chatHistory.push({role:'user',content:msg});
+  const loading=document.createElement('div');
+  loading.className='chat-bubble';
+  loading.innerHTML='<div class="from">Tutor</div><div class="ai-loading">Thinking...</div>';
+  document.getElementById('chat-history').appendChild(loading);
+  const reply=await callClaude(msg,chatHistory.slice(0,-1));
+  chatHistory.push({role:'assistant',content:reply});
+  loading.remove();
+  addBubble(reply,false);
+}
+
+function quickAsk(q){
+  document.getElementById('tutor-input').value=q;
+  askTutor();
+}
+
+function askTutorDirectly(q){
+  document.querySelectorAll('.nav button')[4].click();
+  document.getElementById('tutor-input').value=q;
+  askTutor();
+}
+
+loadTopic();
+loadWritingPrompt();
+loadQuiz();
+loadGrammar();
+</script>
+</body>
+</html>
